@@ -78,10 +78,17 @@ panels = [
 if has_mr:
     panels.append((s["motion_ratio"], "motion ratio [damper/wheel]",
                    "Motion ratio", "#b07cff"))
+panels += [
+    (s["kpi"], "KPI [deg]", "Kingpin inclination", "#f5a524"),
+    (s["scrub_radius"] * 1000, "scrub radius [mm]", "Scrub radius", "#17a2b8"),
+    (s["fvsa"], "FVSA [m]", "Swing-arm length", "#ff7ab6"),
+]
 
-cols = len(panels)
-fig, axes = plt.subplots(1, cols, figsize=(5 * cols, 4.5))
-for ax, (x, xlabel, title, color) in zip(np.atleast_1d(axes), panels):
+cols = min(4, len(panels))
+rows = -(-len(panels) // cols)   # ceil
+fig, axes = plt.subplots(rows, cols, figsize=(5 * cols, 4.5 * rows))
+axes = np.atleast_1d(axes).ravel()
+for ax, (x, xlabel, title, color) in zip(axes, panels):
     ax.plot(x, travel_mm, color=color, lw=2)
     ax.axhline(0, color="#888", lw=0.8)
     ax.axvline(0, color="#888", lw=0.8)
@@ -89,6 +96,8 @@ for ax, (x, xlabel, title, color) in zip(np.atleast_1d(axes), panels):
     ax.set_ylabel("wheel travel [mm]   (+ = bump)")
     ax.set_title(title)
     ax.grid(alpha=0.3)
+for ax in axes[len(panels):]:   # hide unused cells
+    ax.axis("off")
 
 fig.tight_layout()
 os.makedirs("docs", exist_ok=True)
