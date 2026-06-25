@@ -142,8 +142,20 @@ class DoubleWishbone2D:
         camber = self.static_camber + self.camber_sign * (_tilt(u) - self._tilt0)
         rc, ic = _roll_center(self.lca_in, lbj, self.uca_in, ubj, cp)
 
+        # Steering-axis (kingpin = LBJ->UBJ line) front-view geometry:
+        kpi = -_tilt(u)                       # + = axis leans inboard at top
+        if abs(u[1]) > 1e-9:                  # kingpin axis extended to ground z=0
+            t = -lbj[1] / u[1]
+            y_ground = lbj[0] + t * u[0]
+            scrub_radius = float(cp[0] - y_ground)   # + = contact patch outboard
+        else:
+            scrub_radius = float("nan")
+        # Front-view swing-arm length: lateral distance contact patch -> instant center
+        fvsa = float(abs(ic[0] - cp[0])) if ic is not None else float("inf")
+
         result = {"lbj": lbj, "ubj": ubj, "cp": cp, "phi": phi, "camber": camber,
-                  "rc": rc, "rc_height": float(rc[1]), "ic": ic}
+                  "rc": rc, "rc_height": float(rc[1]), "ic": ic,
+                  "kpi": float(kpi), "scrub_radius": scrub_radius, "fvsa": fvsa}
         if self.has_rocker:
             result.update(self._solve_rocker(theta, prev_rk=prev_rk))
         return result
@@ -190,6 +202,7 @@ class DoubleWishbone2D:
         thetas = np.linspace(self._theta_for_travel(-travel),
                              self._theta_for_travel(+travel), n)
         out = {k: [] for k in ("travel", "camber", "scrub", "rc_height",
+                               "kpi", "scrub_radius", "fvsa",
                                "damper_len", "lbj", "ubj", "cp")}
         prev_ubj = prev_rk = None
         for th in thetas:
@@ -200,11 +213,14 @@ class DoubleWishbone2D:
             out["scrub"].append(float(cp[0] - self.cp0[0]))
             out["camber"].append(float(s["camber"]))
             out["rc_height"].append(s["rc_height"])
+            out["kpi"].append(s["kpi"])
+            out["scrub_radius"].append(s["scrub_radius"])
+            out["fvsa"].append(s["fvsa"])
             out["lbj"].append(s["lbj"]); out["ubj"].append(s["ubj"]); out["cp"].append(cp)
             if self.has_rocker:
                 prev_rk = s["rk_push"]
                 out["damper_len"].append(s["damper_len"])
-        for k in ("travel", "camber", "scrub", "rc_height"):
+        for k in ("travel", "camber", "scrub", "rc_height", "kpi", "scrub_radius", "fvsa"):
             out[k] = np.asarray(out[k])
         if self.has_rocker:
             out["damper_len"] = np.asarray(out["damper_len"])

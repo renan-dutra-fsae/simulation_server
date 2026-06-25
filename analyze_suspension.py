@@ -52,6 +52,9 @@ print(f"link lengths (m): LCA={susp.lca_len:.4f}  "
       f"UCA={susp.uca_len:.4f}  upright={susp.upright_len:.4f}")
 print(f"camber gain @ ride: {camber_gain:+.4f} deg/mm  ({camber_gain*25:+.3f} deg / 25 mm)")
 print(f"roll center height @ ride: {rc_mm[i]:+.1f} mm")
+print(f"KPI @ ride: {s['kpi'][i]:.2f} deg   "
+      f"scrub radius @ ride: {s['scrub_radius'][i]*1000:+.1f} mm   "
+      f"FVSA @ ride: {s['fvsa'][i]:.2f} m")
 if has_mr:
     mr = s["motion_ratio"]
     print(f"motion ratio @ ride: {mr[i]:.3f} (damper/wheel)  "

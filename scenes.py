@@ -168,6 +168,9 @@ def build_suspension_kinematics(params) -> dict:
         "camber_deg": sweep["camber"].round(4).tolist(),
         "scrub_mm": (sweep["scrub"] * 1000).round(3).tolist(),
         "rc_height_mm": (sweep["rc_height"] * 1000).round(3).tolist(),
+        "kpi_deg": sweep["kpi"].round(3).tolist(),
+        "scrub_radius_mm": (sweep["scrub_radius"] * 1000).round(3).tolist(),
+        "fvsa_m": [round(v, 3) if np.isfinite(v) else None for v in sweep["fvsa"]],
     }
     if "motion_ratio" in sweep:
         kin["motion_ratio"] = sweep["motion_ratio"].round(4).tolist()
