@@ -7,13 +7,33 @@ Run:  python analyze_suspension.py
 Outputs a printed table and saves docs/suspension_kinematics.png
 """
 import os
+import sys
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
-from kinematics import DoubleWishbone2D, DEFAULT
+from kinematics import DoubleWishbone2D, DEFAULT, from_hardpoints
 
-# Use DEFAULT, or define your car's hardpoints ([y, z] in metres, front view).
-susp = DEFAULT
+
+def load_hardpoints_csv(path):
+    """Read a 'name,y,z' CSV into a {name: [y, z]} dict."""
+    hp = {}
+    with open(path, newline="") as f:
+        for row in csv.reader(f):
+            if not row or row[0].strip().lower() in ("name", "") or row[0].startswith("#"):
+                continue
+            name, y, z = row[0].strip(), float(row[1]), float(row[2])
+            hp[name] = [y, z]
+    return hp
+
+
+# Geometry: a CSV path on the command line, else the built-in DEFAULT.
+#   python analyze_suspension.py mycar.csv
+if len(sys.argv) > 1:
+    susp = from_hardpoints(load_hardpoints_csv(sys.argv[1]))
+    print(f"loaded hardpoints from {sys.argv[1]}")
+else:
+    susp = DEFAULT
 
 TRAVEL = 0.030   # +/- 30 mm
 N = 61

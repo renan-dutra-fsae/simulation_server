@@ -158,19 +158,29 @@ class DoubleWishbone2D:
         phi = np.arctan2(*(ubj - lbj)[::-1]) - self._ang0
         return lbj + _rot(phi) @ (self.cp0 - self.lbj0)
 
-    def _travel_of(self, theta):
-        return self._cp_of(theta)[1] - self.cp0[1]
+    def _safe_travel(self, theta):
+        try:
+            return self._cp_of(theta)[1] - self.cp0[1]
+        except ValueError:
+            return None
 
-    def _theta_for_travel(self, target, lo=-0.7, hi=0.7, iters=64):
-        if self._travel_of(hi) < self._travel_of(lo):
-            lo, hi = hi, lo
-        for _ in range(iters):
-            mid = 0.5 * (lo + hi)
-            if self._travel_of(mid) < target:
-                lo = mid
-            else:
-                hi = mid
-        return 0.5 * (lo + hi)
+    def _theta_for_travel(self, target, max_theta=1.0, steps=240):
+        """Lower-arm angle giving a target wheel travel. Robust to geometries
+        that can't close at large angles: samples only where the linkage closes
+        and interpolates, clamping to the mechanism's physical travel limit."""
+        ths, travs = [0.0], [0.0]
+        for i in range(1, steps + 1):
+            th = (i / steps) * max_theta
+            for s in (+th, -th):
+                t = self._safe_travel(s)
+                if t is not None:
+                    ths.append(s)
+                    travs.append(t)
+        ths, travs = np.asarray(ths), np.asarray(travs)
+        order = np.argsort(travs)                      # travel is monotonic in theta
+        travs, ths = travs[order], ths[order]
+        clamped = float(np.clip(target, travs.min(), travs.max()))
+        return float(np.interp(clamped, travs, ths))
 
     def sweep(self, travel=0.030, n=41):
         """Sweep -travel (rebound) -> +travel (bump). Returns arrays of outputs.
@@ -217,3 +227,23 @@ DEFAULT = DoubleWishbone2D(
     rocker_damper=[0.1007, 0.4721],   # on rocker (damper side)
     damper_inboard=[0.03, 0.345],     # chassis
 )
+
+
+# Hardpoint names accepted by from_hardpoints(). The wishbone needs the first 5;
+# the rocker (and therefore motion ratio) needs all 10.
+WISHBONE_KEYS = ["lca_inboard", "uca_inboard", "lower_ball_joint",
+                 "upper_ball_joint", "contact_patch"]
+ROCKER_KEYS = ["pushrod_outboard", "rocker_pivot", "rocker_pushrod",
+               "rocker_damper", "damper_inboard"]
+
+
+def from_hardpoints(hp, static_camber=0.0, camber_sign=1.0):
+    """Build a DoubleWishbone2D from a {name: [y, z]} dict (e.g. parsed CSV)."""
+    missing = [k for k in WISHBONE_KEYS if k not in hp]
+    if missing:
+        raise ValueError(f"missing hardpoints: {missing}")
+    kwargs = {k: hp[k] for k in WISHBONE_KEYS}
+    if all(k in hp for k in ROCKER_KEYS):       # rocker is optional
+        kwargs.update({k: hp[k] for k in ROCKER_KEYS})
+    return DoubleWishbone2D(**kwargs, static_camber=static_camber,
+                            camber_sign=camber_sign)

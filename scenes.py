@@ -16,7 +16,7 @@ from reference_engine.world import World
 from reference_engine.geometry import Point, Vector
 from reference_engine.force import Gravity
 
-from kinematics import DoubleWishbone2D, DEFAULT as SUSP_DEFAULT
+from kinematics import DoubleWishbone2D, DEFAULT as SUSP_DEFAULT, from_hardpoints
 
 INF = float("inf")
 
@@ -91,9 +91,19 @@ def _p3(p2):
 
 def build_suspension_kinematics(params) -> dict:
     """Sweep the wheel through +/- travel and animate the linkage. No forces:
-    this is a geometric mechanism solve, the correct way to read kinematics."""
-    susp = SUSP_DEFAULT
-    travel = float(params.get("travel", 0.030))      # +/- metres
+    this is a geometric mechanism solve, the correct way to read kinematics.
+
+    params may carry:
+        hardpoints    : {name: [y, z]} to build the geometry (else DEFAULT)
+        static_camber : absolute static camber [deg] (gain is independent of it)
+        travel        : +/- wheel travel [m] (default 0.030)
+    """
+    hp = params.get("hardpoints")
+    if hp:
+        susp = from_hardpoints(hp, static_camber=float(params.get("static_camber", 0.0)))
+    else:
+        susp = SUSP_DEFAULT
+    travel = float(params.get("travel", 0.030))
     n = int(params.get("n_frames", 90))
 
     # Static sweep (rebound -> bump) for the reported curves

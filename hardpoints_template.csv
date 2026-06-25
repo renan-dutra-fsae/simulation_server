@@ -1,0 +1,13 @@
+# Double-wishbone hardpoints, front view. Units: metres. y = lateral (outboard +), z = up.
+# First 5 rows are required (wishbone). Last 5 are optional (pushrod+rocker+damper -> motion ratio).
+name,y,z
+lca_inboard,0.18,0.12
+uca_inboard,0.22,0.32
+lower_ball_joint,0.58,0.13
+upper_ball_joint,0.55,0.34
+contact_patch,0.60,0.00
+pushrod_outboard,0.45,0.135
+rocker_pivot,0.17,0.40
+rocker_pushrod,0.2787,0.417
+rocker_damper,0.1007,0.4721
+damper_inboard,0.03,0.345
