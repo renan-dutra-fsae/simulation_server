@@ -1,7 +1,12 @@
 fastapi>=0.110
 uvicorn[standard]>=0.29
 numpy>=1.24
-
+ 
+# Only needed to run analyze_suspension.py (the standalone analysis script).
+# The server itself (app.py / scenes.py / kinematics.py) does not import it.
+matplotlib>=3.7
+ 
 # The simulation core. Install your engine into the same venv, e.g. from the
 # repo root next to reference-engine:
 #   pip install -e ../reference-engine
+ 
