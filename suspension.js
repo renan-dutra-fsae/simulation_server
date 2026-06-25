@@ -8,16 +8,16 @@ const SVGNS = "http://www.w3.org/2000/svg";
 
 // name, label, default y, default z, required?
 const HARDPOINTS = [
-  ["lca_inboard", "LCA inboard (chassis)", 0.18, 0.12, true],
-  ["uca_inboard", "UCA inboard (chassis)", 0.22, 0.32, true],
-  ["lower_ball_joint", "Lower ball joint", 0.58, 0.13, true],
-  ["upper_ball_joint", "Upper ball joint", 0.55, 0.34, true],
-  ["contact_patch", "Contact patch", 0.60, 0.0, true],
-  ["pushrod_outboard", "Pushrod @ lower arm", 0.45, 0.135, false],
-  ["rocker_pivot", "Rocker pivot (chassis)", 0.17, 0.4, false],
-  ["rocker_pushrod", "Rocker @ pushrod", 0.2787, 0.417, false],
-  ["rocker_damper", "Rocker @ damper", 0.1007, 0.4721, false],
-  ["damper_inboard", "Damper inboard (chassis)", 0.03, 0.345, false],
+  ["lca_inboard", "LCA inboard (chassis)", 0.240260,0.118850, true],
+  ["uca_inboard", "UCA inboard (chassis)", 0.322560,0.303700, true],
+  ["lower_ball_joint", "Lower ball joint", 0.51626,0.139330, true],
+  ["upper_ball_joint", "Upper ball joint", 0.495745,0.355738, true],
+  ["contact_patch", "Contact patch", 0.585,0.00, true],
+  ["pushrod_outboard", "Pushrod @ lower arm", 0.478410,0.154470, false],
+  ["rocker_pivot", "Rocker pivot (chassis)", 0.304450,0.340620, false],
+  ["rocker_pushrod", "Rocker @ pushrod", 0.378880,0.371610, false],
+  ["rocker_damper", "Rocker @ damper", 0.373710,0.402970, false],
+  ["damper_inboard", "Damper inboard (chassis)", 0.253899,0.538541, false],
 ];
 
 const el = (id) => document.getElementById(id);
