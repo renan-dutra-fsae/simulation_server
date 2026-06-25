@@ -1,0 +1,7 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+numpy>=1.24
+
+# The simulation core. Install your engine into the same venv, e.g. from the
+# repo root next to reference-engine:
+#   pip install -e ../reference-engine
