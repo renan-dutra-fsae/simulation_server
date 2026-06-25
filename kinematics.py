@@ -231,17 +231,17 @@ class DoubleWishbone2D:
 # A reasonable FSAE-ish default geometry (short-long arm) with a pushrod-on-lower-
 # arm + rocker + damper. Replace every point with your car's hardpoints.
 DEFAULT = DoubleWishbone2D(
-    lca_inboard=[0.18, 0.12],
-    uca_inboard=[0.22, 0.32],
-    lower_ball_joint=[0.58, 0.13],
-    upper_ball_joint=[0.55, 0.34],
-    contact_patch=[0.60, 0.00],
+    lca_inboard=[0.240260,0.118850],
+    uca_inboard=[0.322560,0.303700],
+    lower_ball_joint=[0.51626,0.139330],
+    upper_ball_joint=[0.495745,0.355738],
+    contact_patch=[0.585,0.00],
     # actuation:
-    pushrod_outboard=[0.45, 0.135],   # on the lower arm
-    rocker_pivot=[0.17, 0.40],        # chassis
-    rocker_pushrod=[0.2787, 0.417],   # on rocker (pushrod side)
-    rocker_damper=[0.1007, 0.4721],   # on rocker (damper side)
-    damper_inboard=[0.03, 0.345],     # chassis
+    pushrod_outboard=[0.478410,0.154470],   # on the lower arm
+    rocker_pivot=[0.304450,0.340620],        # chassis
+    rocker_pushrod=[0.378880,0.371610],   # on rocker (pushrod side)
+    rocker_damper=[0.373710,0.402970],   # on rocker (damper side)
+    damper_inboard=[0.253899,0.538541],     # chassis
 )
 
 
