@@ -20,7 +20,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from scenes import SCENES, record
+from scenes import SCENES, TRAJECTORY_SCENES, record
 
 app = FastAPI(title="simulation_server", version="0.1.0")
 
@@ -41,18 +41,27 @@ class SimRequest(BaseModel):
     params: dict = Field(default_factory=dict, description="Per-scene knobs")
 
 
+def _all_scenes():
+    return sorted(set(SCENES) | set(TRAJECTORY_SCENES))
+
+
 @app.get("/api/scenes")
 def list_scenes():
     """Names the viewer can ask for."""
-    return {"scenes": sorted(SCENES.keys())}
+    return {"scenes": _all_scenes()}
 
 
 @app.post("/api/simulate")
 def simulate(req: SimRequest):
-    if req.scene not in SCENES:
-        raise HTTPException(404, f"unknown scene '{req.scene}'")
-    world, manifest = SCENES[req.scene](req.params)
-    return record(world, manifest, dt=req.dt, n_frames=req.n_frames, scene=req.scene)
+    # Trajectory (prescribed-motion) scenes return a finished payload directly.
+    if req.scene in TRAJECTORY_SCENES:
+        params = {**req.params, "n_frames": req.n_frames}
+        return TRAJECTORY_SCENES[req.scene](params)
+    # Dynamic scenes are time-stepped reference_engine worlds.
+    if req.scene in SCENES:
+        world, manifest = SCENES[req.scene](req.params)
+        return record(world, manifest, dt=req.dt, n_frames=req.n_frames, scene=req.scene)
+    raise HTTPException(404, f"unknown scene '{req.scene}'")
 
 
 # Convenience GET so you can hit it straight from the address bar while testing:
@@ -64,4 +73,4 @@ def simulate_get(scene: str = "pendulum", dt: float = 0.01, n_frames: int = 600)
 
 @app.get("/")
 def health():
-    return {"ok": True, "scenes": sorted(SCENES.keys())}
+    return {"ok": True, "scenes": _all_scenes()}
